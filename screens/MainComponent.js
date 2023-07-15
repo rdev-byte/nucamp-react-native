@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Image, Platform, StyleSheet, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 import CampsiteInfoScreen from './CampsiteInfoScreen';
@@ -144,9 +145,9 @@ const DirectoryNavigator = () => {
             <Stack.Screen
                 name='CampsiteInfo'
                 component={CampsiteInfoScreen}
-                options={({ route }) => ({
-                    title: route.params.campsite.name
-                })}
+                options={{
+                    title: 'Campsite Information' // Set a static title for the screen
+                }}
             />
         </Stack.Navigator>
     );
