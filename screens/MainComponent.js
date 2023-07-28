@@ -240,24 +240,40 @@ const Main = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        NetInfo.fetch().then((connectionInfo) => {
-            Platform.OS === 'ios'
-                ? Alert.alert(
-                      'Initial Network Connectivity Type:',
-                      connectionInfo.type
-                  )
-                : ToastAndroid.show(
-                      'Initial Network Connectivity Type: ' +
-                          connectionInfo.type,
-                      ToastAndroid.LONG
-                  );
-        });
-
-        const unsubscribeNetInfo = NetInfo.addEventListener(
-            (connectionInfo) => {
-                handleConnectivityChange(connectionInfo);
+        const checkInitialConnection = async () => {
+            try {
+                const connectionInfo = await NetInfo.fetch();
+                let connectionMsg = 'You are now connected to an active network.';
+                switch (connectionInfo.type) {
+                    case 'none':
+                        connectionMsg = 'No network connection is active.';
+                        break;
+                    case 'unknown':
+                        connectionMsg = 'The network connection state is now unknown.';
+                        break;
+                    case 'cellular':
+                        connectionMsg = 'You are now connected to a cellular network.';
+                        break;
+                    case 'wifi':
+                        connectionMsg = 'You are now connected to a WiFi network.';
+                        break;
+                }
+                Platform.OS === 'ios'
+                    ? Alert.alert('Initial Network Connectivity Type:', connectionInfo.type)
+                    : ToastAndroid.show(
+                          'Initial Network Connectivity Type: ' + connectionInfo.type,
+                          ToastAndroid.LONG
+                      );
+            } catch (error) {
+                console.log('Error fetching initial net info:', error);
             }
-        );
+        };
+
+        checkInitialConnection();
+
+        const unsubscribeNetInfo = NetInfo.addEventListener((connectionInfo) => {
+            handleConnectivityChange(connectionInfo);
+        });
 
         return unsubscribeNetInfo;
     }, []);
